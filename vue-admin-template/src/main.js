@@ -35,6 +35,8 @@ Vue.use(ElementUI, { locale })
 
 Vue.config.productionTip = false
 
+// console.log(process.env);
+
 new Vue({
   el: '#app',
   router,
