@@ -42,6 +42,18 @@ const actions = {
       })
     })
   },
+  // async login({ commit },userInfo){
+  //   const { username, password } = userInfo
+  //   let result = await login({username:username.trim(),password:password})
+  //   console.log(result);
+  //   if(result.data.code == 20000){
+  //     commit('SET_TOKEN', result.data.token)
+  //     setToken(result.data.token)
+  //     return'ok';
+  //   }else{
+  //     return Promise.reject(new Error('faile'))
+  //   }
+  // },
 
   // get user info
   getInfo({ commit, state }) {

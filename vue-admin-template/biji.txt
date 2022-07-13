@@ -1,0 +1,32 @@
+接口文档
+http://39.98.123.211:8170/swagger-ui.html
+http://39.98.123.211:8416/swagger-ui.html
+
+build 
+    index.js webpack配置文件
+mock
+    模拟假数据
+node_modules
+    项目依赖文件
+public
+    ico图标，静态页面，放静置资源，打包时不会编译这个文件夹，原封不动打包在dist文件夹里面
+src
+    api 接口请求
+    assets 文件夹 放置一些静态资源，webpack打包时会进行编译
+    components
+    icon 放svg矢量图
+    layout 组件和混入
+    router 路由
+    store Vuex
+    style 样式相关
+    utils request.js是axios二次封装
+    views 路由组件
+    app.vue 根组件
+    main.js 入口文件
+    permission.js 与导航守卫有关
+    setting.js 项目的配置项文件
+
+eslint取消:
+// "eslint": "6.7.2",
+// "eslint-plugin-vue": "6.2.2",
+// "@vue/cli-plugin-eslint": "4.4.4",
