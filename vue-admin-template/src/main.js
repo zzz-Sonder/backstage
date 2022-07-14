@@ -23,10 +23,12 @@ import '@/permission' // permission control
  * Currently MockJs will be used in the production environment,
  * please remove it before going online ! ! !
  */
-if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
-}
+
+// 注释mock不然请求会404
+// if (process.env.NODE_ENV === 'production') {
+//   const { mockXHR } = require('../mock')
+//   mockXHR()
+// }
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
@@ -36,6 +38,11 @@ Vue.use(ElementUI, { locale })
 Vue.config.productionTip = false
 
 // console.log(process.env);
+
+// 引入相关api请求接口
+import API from '@/api'
+Vue.prototype.$API = API;
+
 
 new Vue({
   el: '#app',

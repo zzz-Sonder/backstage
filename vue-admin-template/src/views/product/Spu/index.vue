@@ -10,7 +10,9 @@ export default {
     return {};
   },
 
-  mounted() {},
+  mounted() {
+    console.log(this.$API);
+  },
 
   methods: {},
 };

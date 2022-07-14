@@ -2,14 +2,59 @@
   <div>
     品牌管理
     <br />
-    <el-button type="primary" icon="el-icon-plus" style="margin: 10px 0">
+    <el-button
+      type="primary"
+      @click="dialogFormVisible = true"
+      icon="el-icon-plus"
+      style="margin: 10px 0"
+    >
       添加
     </el-button>
-    <el-table style="width: 100%" border>
-      <el-table-column prop="prop" label="序号" width="80px" align="center">
-      </el-table-column>
+
+    <el-dialog title="添加品牌" :visible.sync="dialogFormVisible">
+      <el-form style="width: 80%" :model="tmForm">
+        <el-form-item label="品牌名称" :label-width="formLabelWidth">
+          <el-input v-model="tmForm.tmName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="品牌logo" :label-width="formLabelWidth">
+          <el-upload
+            class="avatar-uploader"
+            action="https://jsonplaceholder.typicode.com/posts/"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <div slot="tip" class="el-upload__tip">
+              只能上传jpg/png文件，且不超过500kb
+            </div>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">
+          确 定
+        </el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 
+      elementUI中的table组件展示的数据是以一列进行展示数据的 
+      prop:对应列内容的字段名
+    -->
+    <el-table style="width: 100%" border :data="list">
       <el-table-column
         prop="prop"
+        label="序号"
+        width="80px"
+        align="center"
+        type="index"
+      >
+      </el-table-column>
+      <el-table-column
+        prop="tmName"
         label="品牌名称"
         width="width"
         align="center"
@@ -21,6 +66,10 @@
         width="width "
         align="center"
       >
+        <template slot-scope="{ row }">
+          <!-- {{ row }} -->
+          <img :src="row.logoUrl" alt="" style="width: 80px; height: 80px" />
+        </template>
       </el-table-column>
       <el-table-column
         prop="prop"
@@ -28,21 +77,36 @@
         width="width"
         align="center"
       >
+        <template>
+          <el-button
+            type="warning"
+            icon="el-icon-edit"
+            size="mini"
+            @click="dialogFormVisible = true"
+          >
+            修改
+          </el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini">
+            删除
+          </el-button>
+        </template>
       </el-table-column>
     </el-table>
     <!-- 分页器 -->
     <!-- 当前第几页，数据总条数，每一页展示的条数 连续页码数-->
     <el-pagination
       style="margin-top: 20px; text-align: center"
-      :current-page="6"
-      :total="99"
-      :pager-count="9"
-      :page-size="3"
-      :page-sizes="[10, 20, 50, 100, 200]"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
+      :current-page="page"
+      :total="total"
+      :page-size="limit"
+      :pager-count="5"
+      :page-sizes="[3, 5, 10]"
       layout=" prev, pager, next, jumper,->,  sizes,total"
+      @current-change="getPageList"
+      @size-change="handleSizeChange"
     >
+      <!-- @size-change="handleSizeChange" -->
+      <!-- @current-change="handleCurrentChange" -->
     </el-pagination>
   </div>
 </template>
@@ -52,14 +116,99 @@ export default {
   name: "trademark",
 
   data() {
-    return {};
+    return {
+      page: 1,
+      limit: 3,
+      //总数居条数
+      total: 0,
+      // 展示的数据
+      list: [],
+      //对话框显示与隐藏的属性
+      dialogFormVisible: false,
+      //不能瞎写，需要看文档
+      tmForm: {
+        tmName: "",
+        logoUrl: "",
+      },
+      formLabelWidth: "120px",
+      imageUrl: "",
+    };
   },
 
-  mounted() {},
+  mounted() {
+    this.getPageList();
+    // console.log(this.$API);
+  },
 
-  methods: {},
+  methods: {
+    //获取品牌列表的数据
+    async getPageList(pager = 1) {
+      this.page = pager;
+      //解构出参数
+      const { page, limit } = this;
+      //获取品牌列表的接口
+      let result = await this.$API.trademark.reqTradeMarkList(page, limit);
+      console.log(result.data.records[0]);
+      if (result.code == 200) {
+        this.total = result.data.total;
+        this.list = result.data.records;
+        console.log(this.total);
+        console.log(this.list);
+      }
+    },
+    handleCurrentChange(pager) {
+      // console.log(pager);
+      // 修改参数
+      this.page = pager;
+      this.getPageList();
+    },
+    handleSizeChange(limit) {
+      // console.log(limit);
+      this.limit = limit;
+      this.getPageList();
+    },
+    //上传图片相关的回调
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
+    },
+  },
 };
 </script>
 
-<style lang="scss" scoped>
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
 </style>
