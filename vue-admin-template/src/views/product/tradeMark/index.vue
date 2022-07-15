@@ -11,30 +11,47 @@
       添加
     </el-button>
 
-    <el-dialog title="添加品牌" :visible.sync="dialogFormVisible">
-      <el-form style="width: 80%" :model="tmForm">
-        <el-form-item label="品牌名称" :label-width="formLabelWidth">
+    <el-dialog
+      :title="tmForm.id ? '修改品牌' : '添加品牌'"
+      :visible.sync="dialogFormVisible"
+    >
+      <el-form style="width: 80%" :model="tmForm" :rules="rules">
+        <el-form-item
+          label="品牌名称"
+          :label-width="formLabelWidth"
+          prop="name"
+        >
           <el-input v-model="tmForm.tmName" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="品牌logo" :label-width="formLabelWidth">
+        <el-form-item
+          label="品牌logo"
+          :label-width="formLabelWidth"
+          prop="region"
+        >
+          <!-- 
+          不能使用v-model因为不是表单元素 
+          action属性:设置上传图片地址
+          :on-success 可以检测图片上传成功，当图片上传成功会执行一次
+          :before-upload 可以在上传图片之前，会执行一次
+          -->
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="/dev-api/admin/product/fileUpload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
           >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <img v-if="tmForm.logoUrl" :src="tmForm.logoUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             <div slot="tip" class="el-upload__tip">
-              只能上传jpg/png文件，且不超过500kb
+              只能上传jpg文件,且不超过500kb
             </div>
           </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">
+        <el-button @click.native="Cancel">取 消</el-button>
+        <el-button type="primary" @click="addorUpdateTradeMark">
           确 定
         </el-button>
       </div>
@@ -77,12 +94,12 @@
         width="width"
         align="center"
       >
-        <template>
+        <template slot-scope="{ row }">
           <el-button
             type="warning"
             icon="el-icon-edit"
             size="mini"
-            @click="dialogFormVisible = true"
+            @click="updateTradeMark(row)"
           >
             修改
           </el-button>
@@ -127,11 +144,27 @@ export default {
       dialogFormVisible: false,
       //不能瞎写，需要看文档
       tmForm: {
+        id: "",
         tmName: "",
         logoUrl: "",
       },
       formLabelWidth: "120px",
       imageUrl: "",
+      //表单验证规则
+      rules: {
+        // 品牌名称验证规则·
+        name: [
+          { required: true, message: "请输入品牌名称", trigger: "blur" },
+          {
+            min: 2,
+            max: 10,
+            message: "长度在 2 到 10 个字符",
+            trigger: "blur",
+          },
+        ],
+        // 品牌图标验证规则
+        region: [{ required: true, message: "请上传品牌图标" }],
+      },
     };
   },
 
@@ -167,10 +200,16 @@ export default {
       this.limit = limit;
       this.getPageList();
     },
-    //上传图片相关的回调
+
+    //上传图片相关的回调（上传成功）
     handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
+      // this.imageUrl = URL.createObjectURL(file.raw);
+      this.tmForm.logoUrl = res.data;
+      console.log(res);
+      // res 是上传成功之后返回的地址
+      // file 是上传成功之后服务器返回给前端的数据
     },
+    // 图片上传之前
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
       const isLt2M = file.size / 1024 / 1024 < 2;
@@ -182,6 +221,41 @@ export default {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
       return isJPG && isLt2M;
+    },
+    Cancel() {
+      this.tmForm = {
+        tmName: "",
+        logoUrl: "",
+      };
+      this.dialogFormVisible = false;
+    },
+    async addorUpdateTradeMark(row) {
+      //发请求（添加品牌/修改品牌）
+      this.dialogFormVisible = false;
+      let result = await this.$API.trademark.reqAddOrUpdateTradeMark(
+        this.tmForm
+      );
+      if (result.code == 200) {
+        this.$message(
+          this.tmForm.id
+            ? {
+                message: "恭喜你，修改成功！",
+                type: "success",
+              }
+            : {
+                message: "恭喜你，上传成功！",
+                type: "success",
+              }
+        );
+        this.getPageList(this.tmForm.id ? this.page : 1);
+      }
+    },
+    updateTradeMark(row) {
+      //row当前用户选中品牌的信息
+      console.log(row);
+      this.tmForm = { ...row };
+      this.dialogFormVisible = true;
+      this.getPageList(this.tmForm.id ? this.page : 1);
     },
   },
 };
