@@ -15,7 +15,8 @@
       :title="tmForm.id ? '修改品牌' : '添加品牌'"
       :visible.sync="dialogFormVisible"
     >
-      <el-form style="width: 80%" :model="tmForm" :rules="rules">
+      <!-- :rules="rules" -->
+      <el-form style="width: 80%" :model="tmForm" ref="ruleForm">
         <el-form-item
           label="品牌名称"
           :label-width="formLabelWidth"
@@ -51,7 +52,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="Cancel">取 消</el-button>
-        <el-button type="primary" @click="addorUpdateTradeMark">
+        <el-button type="primary" @click.native="addorUpdateTradeMark">
           确 定
         </el-button>
       </div>
@@ -103,7 +104,12 @@
           >
             修改
           </el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini">
+          <el-button
+            type="danger"
+            icon="el-icon-delete"
+            size="mini"
+            @click="deleteTradeMark(row)"
+          >
             删除
           </el-button>
         </template>
@@ -229,33 +235,71 @@ export default {
       };
       this.dialogFormVisible = false;
     },
-    async addorUpdateTradeMark(row) {
-      //发请求（添加品牌/修改品牌）
-      this.dialogFormVisible = false;
-      let result = await this.$API.trademark.reqAddOrUpdateTradeMark(
-        this.tmForm
-      );
-      if (result.code == 200) {
-        this.$message(
-          this.tmForm.id
-            ? {
-                message: "恭喜你，修改成功！",
-                type: "success",
-              }
-            : {
-                message: "恭喜你，上传成功！",
-                type: "success",
-              }
+    addorUpdateTradeMark(row) {
+      this.$refs["ruleForm"].validate(async (success) => {
+        //发请求（添加品牌/修改品牌）
+        this.dialogFormVisible = false;
+        let result = await this.$API.trademark.reqAddOrUpdateTradeMark(
+          this.tmForm
         );
-        this.getPageList(this.tmForm.id ? this.page : 1);
-      }
+        if (result.code == 200) {
+          this.$message(
+            this.tmForm.id
+              ? {
+                  message: "恭喜你，修改成功！",
+                  type: "success",
+                }
+              : {
+                  message: "恭喜你，上传成功！",
+                  type: "success",
+                }
+          );
+          this.getPageList(this.tmForm.id ? this.page : 1);
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
     updateTradeMark(row) {
       //row当前用户选中品牌的信息
-      console.log(row);
+      // console.log(row);
       this.tmForm = { ...row };
       this.dialogFormVisible = true;
       this.getPageList(this.tmForm.id ? this.page : 1);
+    },
+    deleteTradeMark(row) {
+      console.log(row);
+      //弹框
+      this.$confirm(`你确定删除${row.tmName}?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          //当用户点击确定按钮的时候会出发
+          //向服务器发请求
+          console.log(1);
+          let result = await this.$API.trademark.reqDeleteTradeMark(row.id);
+          console.log(result);
+          //如果删除成功
+          if (result.code == 200) {
+            this.$message({
+              type: "success",
+              message: "删除成功!",
+            });
+            //再次获取品牌列表数据
+            this.getPageList(this.list.length > 1 ? this.page : this.page - 1);
+          }
+        })
+        .catch(() => {
+          console.log(2);
+          //当用户点击取消按钮的时候会触发
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
   },
 };

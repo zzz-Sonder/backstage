@@ -39,6 +39,10 @@ Vue.config.productionTip = false
 
 // console.log(process.env);
 
+// 导入全局组件
+import components from './components'
+Vue.use(components)
+
 // 引入相关api请求接口
 import API from '@/api'
 Vue.prototype.$API = API;
