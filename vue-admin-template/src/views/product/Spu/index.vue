@@ -11,7 +11,7 @@
     <el-card>
       <div>
         <el-button type="primary" icon="el-icon-plus">添加SPU</el-button>
-        <el-table style="width: 100%" border>
+        <el-table style="width: 100%" border :data="records">
           <el-table-column type="index" label="序号" width="80" align="center">
           </el-table-column>
           <el-table-column prop="spuName" label="SPU名称" width="width">
@@ -56,12 +56,12 @@
           @size-change="handleSizeChange" -->
         <el-pagination
           style="text-align: center"
-          :current-page="6"
-          :page-sizes="[3, 5, 10]"
-          :page-size="3"
+          :current-page="page"
+          :page-sizes="[1, 5, 10]"
+          :page-size="limit"
           layout="prev, pager, next, jumper,->, sizes,total"
-          :total="23"
-          @current-change="getSpuList"
+          :total="total"
+          @current-change="handleCurrentChange(this.page)"
         >
         </el-pagination>
       </div>
@@ -84,6 +84,8 @@ export default {
       //手机新增属性|修改属性
       page: 1, //分页器当前第几页
       limit: 3, //每一页需要展示多少条数据
+      records: [], //spu列表数组
+      total: 0,
     };
   },
 
@@ -92,6 +94,9 @@ export default {
   },
 
   methods: {
+    handleCurrentChange(page) {
+      console.log("page::::" + page);
+    },
     async getAttrList(x, y, z) {
       // console.log(x, y, z);
       // console.log(this);
@@ -109,6 +114,7 @@ export default {
       console.log(this.category2Id);
       console.log(this.category3Id);
       this.getAttrList(this.category1Id, this.category2Id, this.category3Id);
+      this.getSpuList();
     },
     clear1() {
       this.category2Id = "";
@@ -121,9 +127,13 @@ export default {
       // 携带三个参数
       const { page, limit, category3Id } = this;
       //携带三个参数:page 第几页  limit 每一页需要展示多少条数据  三级分类id
-      let result = await this.$API.reqSpuList(page, limit, category3Id);
+      let result = await this.$API.spu.reqSpuList(page, limit, category3Id);
       if (result.code == 200) {
-        console.log(result);
+        console.log(this.total);
+        console.log(result.data.total);
+        console.log(result.data.records);
+        this.total = result.data.total;
+        this.records = result.data.records;
       }
     },
   },
