@@ -8,6 +8,7 @@
             value=""
             v-model="cForm.category1Id"
             @change="handler1"
+            :disabled="show"
           >
             <el-option
               :label="c1.name"
@@ -24,6 +25,7 @@
             value=""
             v-model="cForm.category2Id"
             @change="handler2"
+            :disabled="show"
           >
             <el-option
               :label="c2.name"
@@ -39,6 +41,7 @@
             value=""
             v-model="cForm.category3Id"
             @change="handler3"
+            :disabled="show"
           >
             <el-option
               :label="c3.name"
@@ -56,7 +59,7 @@
 <script>
 export default {
   name: "CategorySelect",
-
+  props: ["show"],
   data() {
     return {
       list1: [],
@@ -97,7 +100,6 @@ export default {
         console.log(this.list2);
         // this.$emit("getCategoryId", category1Id);
         this.$emit("clear1");
-       
       }
     },
     async handler2() {
@@ -113,7 +115,7 @@ export default {
         this.list3 = request3.data;
         console.log(this.list3);
         // this.$emit("getCategoryId", category2Id);
-         this.$emit("clear2");
+        this.$emit("clear2");
       }
     },
     handler3() {
