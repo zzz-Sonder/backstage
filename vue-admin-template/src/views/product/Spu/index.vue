@@ -61,7 +61,7 @@
           :page-size="limit"
           layout="prev, pager, next, jumper,->, sizes,total"
           :total="total"
-          @current-change="handleCurrentChange(this.page)"
+          @current-change="handleCurrentChange(page)"
         >
         </el-pagination>
       </div>
@@ -95,7 +95,8 @@ export default {
 
   methods: {
     handleCurrentChange(page) {
-      console.log("page::::" + page);
+      this.page = page;
+      this.getSpuList;
     },
     async getAttrList(x, y, z) {
       // console.log(x, y, z);
@@ -123,7 +124,8 @@ export default {
     clear2() {
       this.category3Id = "";
     },
-    async getSpuList() {
+    async getSpuList(pages = 1) {
+      this.page = pages;
       // 携带三个参数
       const { page, limit, category3Id } = this;
       //携带三个参数:page 第几页  limit 每一页需要展示多少条数据  三级分类id
