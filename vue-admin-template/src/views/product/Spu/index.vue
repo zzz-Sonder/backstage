@@ -9,8 +9,16 @@
       ></CategorySelect>
     </el-card>
     <el-card>
-      <div>
-        <el-button type="primary" icon="el-icon-plus">添加SPU</el-button>
+      <!-- 三部分 table template 分页 -->
+      <div v-show="scene == 0">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          :disabled="!category3Id"
+          @click="addSpu"
+        >
+          添加SPU
+        </el-button>
         <el-table style="width: 100%" border :data="records">
           <el-table-column type="index" label="序号" width="80" align="center">
           </el-table-column>
@@ -19,7 +27,7 @@
           <el-table-column prop="description" label="SPU描述" width="width">
           </el-table-column>
           <el-table-column prop="prop" label="操作" width="width">
-            <template slot-scope="{ row, $index }">
+            <template slot-scope="{ row }">
               <!-- 这里按钮将来用hintButton替换 -->
               <hint-button
                 type="success"
@@ -53,7 +61,7 @@
           </el-table-column>
         </el-table>
         <!-- 
-          @size-change="handleSizeChange" -->
+           -->
         <el-pagination
           style="text-align: center"
           :current-page="page"
@@ -62,14 +70,19 @@
           layout="prev, pager, next, jumper,->, sizes,total"
           :total="total"
           @current-change="handleCurrentChange(page)"
+          @size-change="handleSizeChange"
         >
         </el-pagination>
       </div>
+      <SpuForm v-show="scene == 1"></SpuForm>
+      <SkuForm v-show="scene == 2"></SkuForm>
     </el-card>
   </div>
 </template>
 
 <script>
+import SkuForm from "./SkuForm";
+import SpuForm from "./SpuForm";
 export default {
   name: "Spu",
 
@@ -86,8 +99,11 @@ export default {
       limit: 3, //每一页需要展示多少条数据
       records: [], //spu列表数组
       total: 0,
+      scene: 0, //代表SPu列表数据 1添加SPU||修改SPU 2添加SPU
     };
   },
+
+  components: { SkuForm, SpuForm },
 
   mounted() {
     console.log(this.$API);
@@ -137,6 +153,16 @@ export default {
         this.total = result.data.total;
         this.records = result.data.records;
       }
+    },
+    handleSizeChange(limit) {
+      this.limit = limit;
+      this.getSpuList();
+    },
+    addSpu() {
+      this.scene = 1;
+    },
+    updateSpu(row) {
+      this.scene = 1;
     },
   },
 };
