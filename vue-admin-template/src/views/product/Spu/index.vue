@@ -74,7 +74,8 @@
         >
         </el-pagination>
       </div>
-      <SpuForm v-show="scene == 1"></SpuForm>
+      <SpuForm v-show="scene == 1" @changescene="changescene" ref="spu">
+      </SpuForm>
       <SkuForm v-show="scene == 2"></SkuForm>
     </el-card>
   </div>
@@ -163,6 +164,11 @@ export default {
     },
     updateSpu(row) {
       this.scene = 1;
+      this.$refs.spu.initSpuData(row);
+    },
+    changescene(x) {
+      this.scene = x;
+      console.log(x);
     },
   },
 };

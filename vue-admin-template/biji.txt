@@ -30,3 +30,9 @@ eslint取消:
 // "eslint": "6.7.2",
 // "eslint-plugin-vue": "6.2.2",
 // "@vue/cli-plugin-eslint": "4.4.4",
+
+
+GET /admin/product/baseTrademark/getTrademarkList    品牌数据需要发请求
+GET /admin/product/baseSaleAttrList   获取平台中全部销售属性
+GET /admin/product/getSpuById/{spuId}  获取某一个SPu信息、
+GET /admin/product/spuImageList/{spuId} 获取图片
