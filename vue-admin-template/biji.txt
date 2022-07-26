@@ -36,3 +36,41 @@ GET /admin/product/baseTrademark/getTrademarkList    品牌数据需要发请求
 GET /admin/product/baseSaleAttrList   获取平台中全部销售属性
 GET /admin/product/getSpuById/{spuId}  获取某一个SPu信息、
 GET /admin/product/spuImageList/{spuId} 获取图片
+
+
+POST /admin/product/saveSpuInfo 添加
+参数有：
+{
+  "category3Id": 0,
+  "tmId": 0
+  "description": "string",
+  "spuName": "string",
+  "spuImageList": [
+    {
+      "id": 0,
+      "imgName": "string",
+      "imgUrl": "string",
+      "spuId": 0
+    }
+  ],
+  
+  "spuSaleAttrList": [
+    {
+      "baseSaleAttrId": 0,
+      "id": 0,
+      "saleAttrName": "string",
+      "spuId": 0,
+      "spuSaleAttrValueList": [
+        {
+          "baseSaleAttrId": 0,
+          "id": 0,
+          "isChecked": "string",
+          "saleAttrName": "string",
+          "saleAttrValueName": "string",
+          "spuId": 0
+        }
+      ]
+    }
+  ],
+  
+}
