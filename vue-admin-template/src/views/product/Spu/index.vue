@@ -5,7 +5,7 @@
         @getCategoryId="getCategoryId"
         @clear1="clear1"
         @clear2="clear2"
-        :show="!isShow"
+        :show="scene != 0"
       ></CategorySelect>
     </el-card>
     <el-card>
@@ -74,8 +74,12 @@
         >
         </el-pagination>
       </div>
-      <SpuForm v-show="scene == 1" ref="spu"></SpuForm>
-      <SkuForm v-show="scene == 2"></SkuForm>
+      <SpuForm
+        v-show="scene == 1"
+        ref="spu"
+        @changeScene="changeScene"
+      ></SpuForm>
+      <SkuForm v-show="scene == 2" ref="sku"></SkuForm>
     </el-card>
   </div>
 </template>
@@ -160,12 +164,23 @@ export default {
     },
     addSpu() {
       this.scene = 1;
+      //通知子组件SpuForm发请求---两个
+      this.$refs.spu.addSpuData(this.category3Id);
     },
     updateSpu(row) {
       this.scene = 1;
       //获取子组件SpuForm子组件的
       //在父组件当中可以通过$ref获取子组件等等
       this.$refs.spu.initSpuData(row);
+    },
+    changeScene({ scene, flag }) {
+      this.scene = scene;
+      //子组件通知父组件切换场景，需要再次获取SPU列表的数据进行展示
+      if (flag == "修改") {
+        this.getSpuList(this.page);
+      } else {
+        this.getSpuList();
+      }
     },
   },
 };

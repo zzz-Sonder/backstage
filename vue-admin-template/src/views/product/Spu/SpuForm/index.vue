@@ -76,10 +76,10 @@
             <template slot-scope="{ row, $index }">
               <el-tag
                 :key="tag.id"
-                v-for="tag in row.spuSaleAttrValueList"
+                v-for="(tag, index) in row.spuSaleAttrValueList"
                 closable
                 :disable-transitions="false"
-                @close="handleClose(tag)"
+                @close="row.spuSaleAttrValueList.splice(index, 1)"
               >
                 {{ tag.saleAttrValueName }}
               </el-tag>
@@ -116,7 +116,7 @@
         </el-table>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">保存</el-button>
+        <el-button type="primary" @click="addOrUpdateSpu">保存</el-button>
         <el-button @click="$emit('changescene', 0)">取消</el-button>
       </el-form-item>
     </el-form>
@@ -133,7 +133,7 @@ export default {
       dialogVisible: false,
       spu: {
         category3Id: 0,
-        tmId: 0,
+        tmId: "",
         description: "",
         spuName: " ",
         spuImageList: [
@@ -269,6 +269,30 @@ export default {
 
       row.spuSaleAttrValueList.push(newSaleAttrValue);
       row.inputVisible = false;
+    },
+    //保存按钮的回调
+    async addOrUpdateSpu() {
+      //整理参数：需要整理照片墙的数据
+      //携带参数：对于图片，需要携带imageName与imageUrl字段
+      this.spu.spuImageList = this.spuImageList.map((item) => {
+        return {
+          imageName: item.name,
+          imageUrl: (item.response && item.response.data) || item.url,
+        };
+      });
+      //发请求
+      let result = await this.$API.spu.reqAddOrUpdateSpu(this.spu);
+      if (result.code == 200) {
+        //提示
+        this.$message({ type: "success", message: "保存成功" });
+        //通知父组件回到场景0
+        this.$emit("changeScene", {
+          scene: 0,
+          flag: this.spu.id ? "修改" : "添加",
+        });
+      }
+      //清除数据
+      Object.assign(this._data, this.$options.data());
     },
   },
 
