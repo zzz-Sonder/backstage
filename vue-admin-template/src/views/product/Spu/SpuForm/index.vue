@@ -117,7 +117,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="addOrUpdateSpu">保存</el-button>
-        <el-button @click="$emit('changescene', 0)">取消</el-button>
+        <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -292,6 +292,11 @@ export default {
         });
       }
       //清除数据
+      Object.assign(this._data, this.$options.data());
+    },
+    cancel() {
+      this.$emit("changeScene", { scene: 0, flag: "" });
+      // 清理数据
       Object.assign(this._data, this.$options.data());
     },
   },
