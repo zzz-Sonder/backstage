@@ -36,7 +36,7 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    // before: require('./mock/mock-server.js')
+    before: require('./mock/mock-server.js'),
     //配置代理跨域
     proxy: {
       "/dev-api": {

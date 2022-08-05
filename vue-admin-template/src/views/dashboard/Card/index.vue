@@ -51,6 +51,9 @@
       <el-col :span="6">
         <el-card>
           <Detail title="访问量" count="88460">
+            <template slot="charts">
+              <lineCharts></lineCharts>
+            </template>
             <template slot="footer">日访问量12344</template>
           </Detail>
         </el-card>
@@ -58,6 +61,7 @@
       <el-col :span="6">
         <el-card>
           <Detail title="支付笔数" count="88460">
+            <template slot="charts"><barCharts /></template>
             <template slot="footer">转换率 65%</template>
           </Detail>
         </el-card>
@@ -65,6 +69,9 @@
       <el-col :span="6">
         <el-card>
           <Detail title="运营活动效果" count="78%">
+            <template slot="charts">
+              <progressCharts />
+            </template>
             <template slot="footer">
               <span>
                 周同比 23.67%
@@ -114,20 +121,17 @@
 
 <script>
 import Detail from "./Detail";
+import lineCharts from "./lineChart";
+import barCharts from "./barCharts";
+import progressCharts from "./progressCharts";
 export default {
-  name: "BackstageIndex",
-
-  data() {
-    return {};
-  },
-
+  name: "",
   components: {
     Detail,
+    lineCharts,
+    barCharts,
+    progressCharts,
   },
-
-  mounted() {},
-
-  methods: {},
 };
 </script>
 
